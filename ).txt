@@ -1,0 +1,127 @@
+string oct_to_dec(string do_zap, string posle_zap) {
+    long long result1 = 0;
+    int stepen1 = 1;
+    for (int i = do_zap.length() - 1; i >= 0; i--) {
+        result1 += (do_zap[i] - '0') * stepen1;
+        stepen1 *= 8;
+    }
+
+    double result2 = 0;
+    double stepen2 = 0.125;
+
+    for (int i = 0; i < posle_zap.length(); i++) {
+        result2 += (posle_zap[i] - '0') * stepen2;
+        stepen2 /= 8;
+    }
+
+    // Выделяем целую часть из result2 и добавляем к result1
+    long long int_part = static_cast<long long>(result2);
+    result2 -= int_part;
+    result1 += int_part;
+
+    string temp = to_string(result2);
+
+    // Разделяем целую и дробную части
+    size_t dot_pos = temp.find('.');
+    if (dot_pos != string::npos) {
+        string integer_part = temp.substr(0, dot_pos);
+        string fractional_part = temp.substr(dot_pos + 1);
+
+        // Удаляем незначащие нули
+        while (!fractional_part.empty() && fractional_part.back() == '0') {
+            fractional_part.pop_back();
+        }
+
+        if (fractional_part.empty()) {
+            temp = integer_part;
+        } else {
+            temp = integer_part + "." + fractional_part;
+        }
+    }
+
+    string oct_dec;
+    if (result2 == 0 && int_part == 0) {
+        oct_dec = to_string(result1);
+    }
+    else if (result1 == 0) {
+        oct_dec = temp;
+    }
+    else {
+        oct_dec = to_string(result1) + "." + temp;
+    }
+    return oct_dec;
+}
+
+string hex_to_dec(string do_zap, string posle_zap) {
+    long long result1 = 0;
+    long long stepen1 = 1;
+    for (int i = do_zap.length() - 1; i >= 0; i--) {
+        int digit;
+        if (do_zap[i] >= '0' && do_zap[i] <= '9') {
+            digit = do_zap[i] - '0';
+        }
+        else if (do_zap[i] >= 'A' && do_zap[i] <= 'F') {
+            digit = do_zap[i] - 'A' + 10;
+        }
+        else {
+            digit = 0; // на всякий случай
+        }
+        result1 += digit * stepen1;
+        stepen1 *= 16;
+    }
+
+    double result2 = 0;
+    double stepen2 = 0.0625;
+
+    for (int i = 0; i < posle_zap.length(); i++) {
+        int digit;
+        if (posle_zap[i] >= '0' && posle_zap[i] <= '9') {
+            digit = posle_zap[i] - '0';
+        }
+        else if (posle_zap[i] >= 'A' && posle_zap[i] <= 'F') {
+            digit = posle_zap[i] - 'A' + 10;
+        }
+        else {
+            digit = 0;
+        }
+        result2 += digit * stepen2;
+        stepen2 /= 16;
+    }
+
+    // Выделяем целую часть из result2 и добавляем к result1
+    long long int_part = static_cast<long long>(result2);
+    result2 -= int_part;
+    result1 += int_part;
+
+    string temp = to_string(result2);
+
+    // Разделяем целую и дробную части
+    size_t dot_pos = temp.find('.');
+    if (dot_pos != string::npos) {
+        string integer_part = temp.substr(0, dot_pos);
+        string fractional_part = temp.substr(dot_pos + 1);
+
+        // Удаляем незначащие нули
+        while (!fractional_part.empty() && fractional_part.back() == '0') {
+            fractional_part.pop_back();
+        }
+
+        if (fractional_part.empty()) {
+            temp = integer_part;
+        } else {
+            temp = integer_part + "." + fractional_part;
+        }
+    }
+
+    string hex_dec;
+    if (result2 == 0 && int_part == 0) {
+        hex_dec = to_string(result1);
+    }
+    else if (result1 == 0) {
+        hex_dec = temp;
+    }
+    else {
+        hex_dec = to_string(result1) + "." + temp;
+    }
+    return hex_dec;
+}
