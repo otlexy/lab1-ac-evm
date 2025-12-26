@@ -176,6 +176,7 @@ string convertNumber(const string& number, int cc1, int cc2) {
 }
 
 // ОСНОВНАЯ ПРОГРАММА
+// ОСНОВНАЯ ПРОГРАММА
 int main() {
     setlocale(LC_ALL, "Russian");
 
@@ -236,14 +237,11 @@ int main() {
     string dec1Str = convertNumber(num1, base1, 10);
     string dec2Str = convertNumber(num2, base2, 10);
 
-
-    double d1 = stod(dec1Str);
-    double d2 = stod(dec2Str);
+    double d1 = safeStod(dec1Str);
+    double d2 = safeStod(dec2Str);
 
     // --- Выполнение операции ---
     double resultDec;
-    bool error = false;
-
     if (op == '+') {
         resultDec = d1 + d2;
     }
@@ -254,74 +252,22 @@ int main() {
         resultDec = d1 * d2;
     }
     else if (op == '/') {
-        if (d2 > -1e-12 && d2 < 1e-12) {
+        if (abs(d2) < 1e-12) {
             cout << "Ошибка: деление на ноль!\n";
-            error = true;
+            return 1;
         }
-        else {
-            resultDec = d1 / d2;
-        }
+        resultDec = d1 / d2;
     }
 
-    if (error) {
-        return 1;
-    }
-
-    // --- Преобразуем результат в строку десятичного числа ---
-    string resultStr;
-    if (resultDec == 0.0 || (resultDec < 1e-10 && resultDec > -1e-10)) {
-        resultStr = "0";
-    }
-    else {
-        bool neg = false;
-        double x = resultDec;
-        if (x < 0) {
-            neg = true;
-            x = -x;
-        }
-
-        // Целая часть
-        long long ip = (long long)x;
-        string intPart = "";
-        if (ip == 0) {
-            intPart = "0";
-        }
-        else {
-            long long tmp = ip;
-            while (tmp > 0) {
-                intPart = char('0' + (tmp % 10)) + intPart;
-                tmp /= 10;
-            }
-        }
-
-        // Дробная часть (6 знаков как в to_string)
-        string fracPart = "";
-        double fp = x - ip;
-        if (fp > 1e-10) {
-            for (int i = 0; i < 6; i++) {
-                fp *= 10;
-                int digit = (int)fp;
-                fracPart += char('0' + digit);
-                fp -= digit;
-            }
-            // Убрать конечные нули
-            while (!fracPart.empty() && fracPart[fracPart.length() - 1] == '0') {
-                fracPart = fracPart.substr(0, fracPart.length() - 1);
-            }
-        }
-
-        resultStr = intPart;
-        if (!fracPart.empty()) {
-            resultStr += "." + fracPart;
-        }
-        if (neg) {
-            resultStr = "-" + resultStr;
-        }
-    }
+    // --- Простое преобразование double в string ---
+    ostringstream oss;
+    oss.imbue(locale::classic());
+    oss << fixed << setprecision(10) << resultDec;
+    string resultStr = oss.str();
 
     // --- Перевод результата в целевую систему ---
+    // convertNumber сам удалит лишние нули при переводе в resBase
     string finalResult = convertNumber(resultStr, 10, resBase);
-
     if (finalResult == "ERROR") {
         cout << "Ошибка при конвертации результата!\n";
         return 1;
